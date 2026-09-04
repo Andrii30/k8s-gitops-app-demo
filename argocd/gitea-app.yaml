@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitea-demo
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://dl.gitea.com/charts/
+    chart: gitea
+    targetRevision: "10.4.1"
+    helm:
+      valuesObject:
+        gitea:
+          admin:
+            username: gitea_admin
+            password: "ChangeMe123!"
+            email: admin@example.com
+          config:
+            database:
+              DB_TYPE: sqlite3
+        # ponytail: persistence off, ephemeral demo data — set
+        # persistence.enabled: true and a size here if data needs to
+        # survive pod restarts.
+        persistence:
+          enabled: false
+        postgresql:
+          enabled: false
+        postgresql-ha:
+          enabled: false
+        redis-cluster:
+          enabled: false
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitops-app-demo
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
