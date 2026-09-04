@@ -13,9 +13,9 @@ spec:
       valuesObject:
         gitea:
           admin:
-            username: gitea_admin
-            password: "ChangeMe123!"
-            email: admin@example.com
+            # Credential lives in a Secret created directly in-cluster
+            # (see README "Deploy" section) — never committed to git.
+            existingSecret: gitea-admin-credential
           config:
             database:
               DB_TYPE: sqlite3

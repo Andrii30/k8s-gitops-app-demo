@@ -9,7 +9,13 @@ reconciles the cluster to match.
   shared setup — install ArgoCD once per cluster).
 
 ## Deploy
+The admin credential is never committed to git — create it directly in
+the cluster first, then apply the Application:
 ```bash
+kubectl create namespace gitops-app-demo --dry-run=client -o yaml | kubectl apply -f -
+kubectl -n gitops-app-demo create secret generic gitea-admin-credential \
+  --from-literal=username=gitea_admin \
+  --from-literal=password='<pick-your-own-password>'
 kubectl apply -f argocd/gitea-app.yaml
 ```
 
@@ -18,8 +24,8 @@ kubectl apply -f argocd/gitea-app.yaml
 kubectl -n gitops-app-demo get svc   # find the *-http service
 kubectl -n gitops-app-demo port-forward svc/<that-service> 3000:3000
 ```
-Open http://localhost:3000 — log in as `gitea_admin` / `ChangeMe123!`
-(change this in `argocd/gitea-app.yaml` before any real use).
+Open http://localhost:3000 — log in as `gitea_admin` and the password
+you chose above.
 
 ## GitOps flow
 Any change pushed to `argocd/gitea-app.yaml` (e.g. bumping
